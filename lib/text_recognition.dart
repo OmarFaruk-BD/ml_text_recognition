@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:text_recognition_ml/camera_page.dart';
+import 'package:text_recognition_ml/widgets/custom_button.dart';
 
 class TextRecognitionPage extends StatefulWidget {
   const TextRecognitionPage({Key? key}) : super(key: key);
@@ -40,8 +42,33 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildButton('Gallery', ImageSource.gallery),
-                    _buildButton('Camera', ImageSource.camera),
+                    CustomButton(
+                      name: 'Camera',
+                      icon: Icons.camera,
+                      onTap: () {
+                        getImage(ImageSource.camera);
+                      },
+                    ),
+                    CustomButton(
+                      name: 'Gallery',
+                      icon: Icons.camera,
+                      onTap: () {
+                        getImage(ImageSource.gallery);
+                      },
+                    ),
+                    CustomButton(
+                      name: 'Camera',
+                      icon: Icons.camera,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                const CameraPage(),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(
@@ -53,40 +80,6 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
                 )
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButton(String name, ImageSource source) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      padding: const EdgeInsets.only(top: 10),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          shadowColor: Colors.grey[400],
-          elevation: 10,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-        ),
-        onPressed: () {
-          getImage(source);
-        },
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.image,
-                size: 30,
-              ),
-              Text(
-                "Gallery",
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-              )
-            ],
           ),
         ),
       ),

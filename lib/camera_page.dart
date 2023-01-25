@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 
 class CameraPage extends StatefulWidget {
-  CameraPage({
+  const CameraPage({
     Key? key,
-    required this.cameras,
   }) : super(key: key);
-  List<CameraDescription> cameras;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -19,8 +17,14 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   void initState() {
+    setControler();
     super.initState();
-    controller = CameraController(widget.cameras[0], ResolutionPreset.max);
+  }
+
+  void setControler() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    var cameras = await availableCameras();
+    controller = CameraController(cameras[0], ResolutionPreset.max);
     controller.initialize().then((_) {
       if (!mounted) {
         return;

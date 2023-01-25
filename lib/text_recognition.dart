@@ -5,14 +5,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:text_recognition_ml/camera_page.dart';
 import 'package:text_recognition_ml/widgets/custom_button.dart';
 
-class TextRecognitionPage extends StatefulWidget {
-  const TextRecognitionPage({Key? key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<TextRecognitionPage> createState() => _TextRecognitionPageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _TextRecognitionPageState extends State<TextRecognitionPage> {
+class _HomePageState extends State<HomePage> {
   bool textScanning = false;
   XFile? imageFile;
   String scannedText = '';
@@ -22,67 +22,68 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        elevation: 0,
         title: const Text('Text Recognition'),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (textScanning) const CircularProgressIndicator(),
-                if (!textScanning && imageFile == null)
-                  Container(
-                    width: 300,
-                    height: 300,
-                    color: Colors.grey[300]!,
-                  ),
-                if (imageFile != null) Image.file(File(imageFile!.path)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CustomButton(
-                      name: 'Camera',
-                      icon: Icons.camera,
-                      onTap: () {
-                        getImage(ImageSource.camera);
-                      },
-                    ),
-                    CustomButton(
-                      name: 'Gallery',
-                      icon: Icons.camera,
-                      onTap: () {
-                        getImage(ImageSource.gallery);
-                      },
-                    ),
-                    CustomButton(
-                      name: 'Camera',
-                      icon: Icons.camera,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                const CameraPage(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+      body: SingleChildScrollView(
+        child: Container(
+          margin: const EdgeInsets.all(5),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildButton(context),
+              const SizedBox(height: 20),
+              if (imageFile != null)
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  child: Image.file(File(imageFile!.path)),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Text(
-                  scannedText,
-                  style: const TextStyle(fontSize: 20),
-                )
-              ],
-            ),
+              if (textScanning) const CircularProgressIndicator(),
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                scannedText,
+                style: const TextStyle(fontSize: 20),
+              )
+            ],
           ),
         ),
       ),
+    );
+  }
+
+  Row _buildButton(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CustomButton(
+          name: 'Gallery',
+          icon: Icons.photo,
+          onTap: () {
+            getImage(ImageSource.gallery);
+          },
+        ),
+        CustomButton(
+          name: 'Camera',
+          icon: Icons.camera,
+          onTap: () {
+            getImage(ImageSource.camera);
+          },
+        ),
+        CustomButton(
+          name: 'Instant',
+          icon: Icons.control_point,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => const CameraPage(),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -92,15 +93,14 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
       if (pickedImage != null) {
         textScanning = true;
         imageFile = pickedImage;
-        setState(() {});
         getRecognisedText(pickedImage);
       }
     } catch (e) {
       textScanning = false;
       imageFile = null;
       scannedText = "Error occured while scanning";
-      setState(() {});
     }
+    setState(() {});
   }
 
   void getRecognisedText(XFile image) async {

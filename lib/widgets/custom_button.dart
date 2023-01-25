@@ -30,9 +30,9 @@ class CustomButton extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.image,
-                size: 30,
+              Icon(
+                icon,
+                size: 25,
               ),
               Text(
                 name,

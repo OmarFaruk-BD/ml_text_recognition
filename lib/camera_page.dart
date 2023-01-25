@@ -5,7 +5,10 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 class CameraPage extends StatefulWidget {
   const CameraPage({
     Key? key,
+    required this.cameras,
   }) : super(key: key);
+
+  final List<CameraDescription> cameras;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -17,14 +20,11 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   void initState() {
-    setControler();
     super.initState();
-  }
-
-  void setControler() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    var cameras = await availableCameras();
-    controller = CameraController(cameras[0], ResolutionPreset.max);
+    controller = CameraController(
+      widget.cameras[0],
+      ResolutionPreset.max,
+    );
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -49,33 +49,40 @@ class _CameraPageState extends State<CameraPage> {
       );
     }
     return Scaffold(
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: SizedBox(
-                height: 400,
-                width: 400,
-                child: CameraPreview(controller),
+      body: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FutureBuilder(
+              builder: ((context, snapshot) {
+                return Container();
+              }),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: SizedBox(
+                  height: 400,
+                  width: 400,
+                  child: CameraPreview(controller),
+                ),
               ),
             ),
-          ),
-          FutureBuilder(
-            future: getRecognisedText(),
-            builder: ((context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasError) {
-                return const CircularProgressIndicator();
-              }
-              if (snapshot.hasData) {
-                return Text(snapshot.data!);
-              }
-              return const Text('eror');
-            }),
-          ),
-        ],
+            FutureBuilder(
+              future: getRecognisedText(),
+              builder: ((context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasError) {
+                  return const CircularProgressIndicator();
+                }
+                if (snapshot.hasData) {
+                  return Text(snapshot.data!);
+                }
+                return const Text('eror');
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }

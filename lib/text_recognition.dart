@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +17,18 @@ class _HomePageState extends State<HomePage> {
   bool textScanning = false;
   XFile? imageFile;
   String scannedText = '';
+  List<CameraDescription> cameras = [];
+
+  @override
+  void initState() {
+    super.initState();
+    setControler();
+  }
+
+  void setControler() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    cameras = await availableCameras();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,28 +38,30 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         title: const Text('Text Recognition'),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.all(5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildButton(context),
-              const SizedBox(height: 20),
-              if (imageFile != null)
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  child: Image.file(File(imageFile!.path)),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            margin: const EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildButton(context),
+                const SizedBox(height: 20),
+                if (imageFile != null)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: Image.file(File(imageFile!.path)),
+                  ),
+                if (textScanning) const CircularProgressIndicator(),
+                const SizedBox(
+                  height: 20,
                 ),
-              if (textScanning) const CircularProgressIndicator(),
-              const SizedBox(
-                height: 20,
-              ),
-              Text(
-                scannedText,
-                style: const TextStyle(fontSize: 20),
-              )
-            ],
+                Text(
+                  scannedText,
+                  style: const TextStyle(fontSize: 20),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -78,7 +93,9 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => const CameraPage(),
+                builder: (BuildContext context) => CameraPage(
+                  cameras: cameras,
+                ),
               ),
             );
           },
